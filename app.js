@@ -2,13 +2,18 @@ import config from './config/config'
 
 import {User, Product} from './models'
 
-import watcher from './dirwatcher'
+import DirWatcher from './dirwatcher'
+import Importer from './importer'
 
 console.log(config.name)
 
 new User()
 new Product()
 
-let w = new watcher();
+const watcher = new DirWatcher();
+const importer = new Importer();
 
-w.watch();
+watcher.watch();
+watcher.on('changed', (data) => {
+  importer.import(`${__dirname}\\${data}`);
+})
