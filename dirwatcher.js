@@ -1,11 +1,10 @@
-import EventEmitter from 'events'
-import fs from 'fs'
+import EventEmitter from "events";
+import fs from "fs";
 
 export default class DirWatcher extends EventEmitter {
-
-    watch() {
-        fs.watch('./data', (e, filename) => {
-            this.emit('changed', filename)
-        })
-    }
+  watch(path, delay) {
+    fs.watch(path, (e, filename) => {
+      this.emit("changed", `${path}/${filename}`);
+    });
+  }
 }

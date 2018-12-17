@@ -1,2 +1,1 @@
-export default {"name": "Node.js Homework Application"}
-
+export default { name: "Node.js Homework Application" };
