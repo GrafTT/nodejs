@@ -12,8 +12,11 @@ const watcher = new DirWatcher();
 const importer = new Importer();
 
 watcher.watch("./data", 1000);
+// watcher.on("changed", data => {
+//   importer.import(data);
+// });
 watcher.on("changed", data => {
-  importer.import(`./data/${data}`);
+  importer.importSync(data);
 });
 
 console.log(importer.jsonData);

@@ -1,10 +1,11 @@
 import EventEmitter from "events";
-import fs from "fs";
+import chokidar from "chokidar";
 
 export default class DirWatcher extends EventEmitter {
   watch(path, delay) {
-    fs.watch(path, (e, filename) => {
-      this.emit("changed", `${path}/${filename}`);
+    let w = chokidar.watch(path, {persistent: true});
+    w.on('change', p => {
+      this.emit("changed", p);
     });
   }
 }
