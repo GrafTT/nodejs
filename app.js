@@ -4,7 +4,7 @@ import { User, Product } from "./models";
 
 import DirWatcher from "./dirwatcher";
 import Importer from "./importer";
-import streams from "./util/streams";
+
 
 new User();
 new Product();
@@ -21,4 +21,3 @@ watcher.on("changed", data => {
 });
 
 console.log(importer.jsonData);
-streams();

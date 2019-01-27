@@ -1,29 +1,81 @@
 #!/usr/bin/env node
-const yargs = require('yargs') ;
 
-  let argv = yargs.argv;
- 
-  if(argv.a === 'outputFile' || argv.action==='outputFile') {
-    if(!(argv.file || argv.f)) {
-      console.error('no file')
+const yargs = require('yargs');
+const fs = require('fs');
+const csv = require("csvtojson");
+
+let argv = yargs
+  .options({
+    'a': {
+      alias: 'action',
+      demandOption: true,
+      describe: 'Action you want to go',
+      type: 'string',
+      choices: ['transform', 'reverse', 'outputFile', 'transformToFile', 'transformFromFile'],
+
     }
-  } else if(argv.a === 'transformToFile' || argv.action === 'transformToFile') {
+  })
+  .argv;
 
-  }else if(argv.a === 'transform' || argv.action === 'transform') {
+if (argv.a === 'transform') {
+  process.stdin.on('data', function (data) {
+    process.stdout.write(data.toString().toUpperCase())
+  })
+}
+if (argv.a === 'reverse') {
+  process.stdin.on('data', function (data) {
+    process.stdout.write(data.toString().split('').reverse().join(''))
+  })
+  // process.stdout.write(argv._.join(' '))
+}
 
-  } else if(argv.a === 'transformFromFile' || argv.action === 'transformFromFile') {
-
-  }else if(argv.a === 'reverse' || argv.action === 'reverse') {
-
-  } else if(argv.a === 'cssBundler' || argv.action === 'cssBundler') {
-
+if (argv.a === 'outputFile') {
+  yargs.option({
+    'f': {
+      alias: 'file',
+      demandOption: true,
+      describe: 'File you want to read data'
+    }
+  })
+  if (!argv.f || !(typeof argv.f === 'string')) {
+    console.error('Additional option --file(-f) is required', __dirname)
   } else {
 
+    let readStream = fs.createReadStream(`${__dirname}/${argv.f}`, 'utf8');
+
+    // readStream.on('data', function(chunk) {
+    //   process.stdout.write(chunk)
+    // })
+    readStream.on('error', function (err) {
+      if (err.code == 'ENOENT') {
+        console.log("File not Found!");
+      } else {
+        console.error(err);
+      }
+    });
+    readStream.pipe(process.stdout);
   }
-console.log(argv)
+}
 
+if (argv.a === 'transformFromFile') {
+  yargs.option({
+    'f': {
+      alias: 'file',
+      demandOption: true,
+      describe: 'File you want to convert data'
+    }
+  })
+  if (!argv.f || !(typeof argv.f === 'string')) {
+    console.error('Additional option --file(-f) is required', __dirname)
+  } else {
+    async function imp(path) {
+      const jsonArray = await csv().fromFile(path);
+      // console.log(jsonArray)
+      process.stderr.write(jsonArray.toString());
+    }
+    imp(`${__dirname}/${argv.f}`)
+    
+  }
+}
 
-
-
-
-
+yargs.help('help').alias('help', 'h');

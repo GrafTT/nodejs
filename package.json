@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "nodemon --exec babel-node app.js",
-    "util": "node ./util/streams.js"
+    "util": "nodemon --exec ./util/streams.js"
   },
   "repository": {
     "type": "git",
