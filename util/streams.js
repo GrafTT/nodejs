@@ -43,9 +43,6 @@ if (argv.a === 'outputFile') {
 
     let readStream = fs.createReadStream(`${__dirname}/${argv.f}`, 'utf8');
 
-    // readStream.on('data', function(chunk) {
-    //   process.stdout.write(chunk)
-    // })
     readStream.on('error', function (err) {
       if (err.code == 'ENOENT') {
         console.log("File not Found!");
@@ -71,9 +68,34 @@ if (argv.a === 'transformFromFile') {
     async function imp(path) {
       const jsonArray = await csv().fromFile(path);
       // console.log(jsonArray)
-      process.stderr.write(jsonArray.toString());
+      process.stdout.write(jsonArray.toString());
     }
     imp(`${__dirname}/${argv.f}`)
+    
+  }
+}
+
+if (argv.a === 'transformToFile') {
+  yargs.option({
+    'f': {
+      alias: 'file',
+      demandOption: true,
+      describe: 'File you want to convert data'
+    }
+  })
+  if (!argv.f || !(typeof argv.f === 'string')) {
+    console.error('Additional option --file(-f) is required', __dirname)
+  } else {
+    let readStream = fs.createReadStream(`${__dirname}/${argv.f}`);
+    let writeStream = fs.createWriteStream(`${__dirname}/result.json`);
+    readStream.pipe(csv()).pipe(writeStream);
+    readStream.on('error', function (err) {
+      if (err.code == 'ENOENT') {
+        console.log("File not Found!");
+      } else {
+        console.error(err);
+      }
+    });
     
   }
 }
