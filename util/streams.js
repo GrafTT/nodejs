@@ -3,6 +3,7 @@
 const yargs = require('yargs');
 const fs = require('fs');
 const csv = require("csvtojson");
+const path = require("path");
 
 let argv = yargs
   .options({
@@ -11,7 +12,7 @@ let argv = yargs
       demandOption: true,
       describe: 'Action you want to go',
       type: 'string',
-      choices: ['transform', 'reverse', 'outputFile', 'transformToFile', 'transformFromFile'],
+      choices: ['transform', 'reverse', 'outputFile', 'transformToFile', 'transformFromFile', 'cssBundler'],
 
     }
   })
@@ -71,7 +72,7 @@ if (argv.a === 'transformFromFile') {
       process.stdout.write(jsonArray.toString());
     }
     imp(`${__dirname}/${argv.f}`)
-    
+
   }
 }
 
@@ -96,8 +97,66 @@ if (argv.a === 'transformToFile') {
         console.error(err);
       }
     });
-    
+
   }
 }
 
-yargs.help('help').alias('help', 'h');
+if (argv.a === 'cssBundler') {
+  yargs.option({
+    'p': {
+      alias: 'path',
+      demandOption: true,
+      describe: 'Directory with css files'
+    }
+  })
+  if (!argv.p || !(typeof argv.p === 'string')) {
+    console.error('Additional option --path(-p) is required', __dirname)
+  } else {
+    const css = `
+.ngmp18 {
+  background-color: #fff;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.ngmp18__hw3 {
+  color: #333;
+}
+
+.ngmp18__hw3--t7 {
+  font-weight: bold;
+}`;
+    fs.readdir(argv.p, (err, items) => {
+      if (err) {
+        if (err.code == 'ENOENT') {
+          console.log("Path not Found!");
+        } else {
+          console.error(err);
+        }
+      } else {
+        items.forEach(item => {
+          if (path.parse(item).name === 'bundle') {
+            fs.writeFileSync(`${argv.p}/bundle.css`, '');
+          };
+        })
+        items.forEach(item => {
+          if (path.parse(item).ext === '.css') {
+            let readFile = fs.readFileSync(`${argv.p}/${item}`, 'utf8');
+            fs.appendFileSync(`${argv.p}/bundle.css`, `\n${readFile}`, 'utf8', (err) => {
+              if (err) throw err;
+              console.log('Данные были добавлены в конец файла!');
+            });
+          }
+        })
+        fs.appendFileSync(`${argv.p}/bundle.css`, `\n${css}`, 'utf8', (err) => {
+          if (err) throw err;
+          console.log('Данные были добавлены в конец файла!');
+        });
+      }
+    })
+  }
+}
+
+yargs.help('help').alias('help', 'h')
