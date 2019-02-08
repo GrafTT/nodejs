@@ -1,51 +1,59 @@
 #!/usr/bin/env node
 
-const yargs = require('yargs');
-const fs = require('fs');
+const yargs = require("yargs");
+const fs = require("fs");
 const csv = require("csvtojson");
 const path = require("path");
 
-let argv = yargs
-  .options({
-    'a': {
-      alias: 'action',
-      demandOption: true,
-      describe: 'Action you want to go',
-      type: 'string',
-      choices: ['transform', 'reverse', 'outputFile', 'transformToFile', 'transformFromFile', 'cssBundler'],
+let argv = yargs.options({
+  a: {
+    alias: "action",
+    demandOption: true,
+    describe: "Action you want to go",
+    type: "string",
+    choices: [
+      "transform",
+      "reverse",
+      "outputFile",
+      "transformToFile",
+      "transformFromFile",
+      "cssBundler"
+    ]
+  }
+}).argv;
 
-    }
-  })
-  .argv;
-
-if (argv.a === 'transform') {
-  process.stdin.on('data', function (data) {
-    process.stdout.write(data.toString().toUpperCase())
-  })
+if (argv.a === "transform") {
+  process.stdin.on("data", function(data) {
+    process.stdout.write(data.toString().toUpperCase());
+  });
 }
-if (argv.a === 'reverse') {
-  process.stdin.on('data', function (data) {
-    process.stdout.write(data.toString().split('').reverse().join(''))
-  })
-  // process.stdout.write(argv._.join(' '))
+if (argv.a === "reverse") {
+  process.stdin.on("data", function(data) {
+    process.stdout.write(
+      data
+        .toString()
+        .split("")
+        .reverse()
+        .join("")
+    );
+  });
 }
 
-if (argv.a === 'outputFile') {
+if (argv.a === "outputFile") {
   yargs.option({
-    'f': {
-      alias: 'file',
+    f: {
+      alias: "file",
       demandOption: true,
-      describe: 'File you want to read data'
+      describe: "File you want to read data"
     }
-  })
-  if (!argv.f || !(typeof argv.f === 'string')) {
-    console.error('Additional option --file(-f) is required', __dirname)
+  });
+  if (!argv.f || !(typeof argv.f === "string")) {
+    console.error("Additional option --file(-f) is required", __dirname);
   } else {
+    let readStream = fs.createReadStream(`${__dirname}/${argv.f}`, "utf8");
 
-    let readStream = fs.createReadStream(`${__dirname}/${argv.f}`, 'utf8');
-
-    readStream.on('error', function (err) {
-      if (err.code == 'ENOENT') {
+    readStream.on("error", function(err) {
+      if (err.code == "ENOENT") {
         console.log("File not Found!");
       } else {
         console.error(err);
@@ -55,62 +63,59 @@ if (argv.a === 'outputFile') {
   }
 }
 
-if (argv.a === 'transformFromFile') {
+if (argv.a === "transformFromFile") {
   yargs.option({
-    'f': {
-      alias: 'file',
+    f: {
+      alias: "file",
       demandOption: true,
-      describe: 'File you want to convert data'
+      describe: "File you want to convert data"
     }
-  })
-  if (!argv.f || !(typeof argv.f === 'string')) {
-    console.error('Additional option --file(-f) is required', __dirname)
+  });
+  if (!argv.f || !(typeof argv.f === "string")) {
+    console.error("Additional option --file(-f) is required", __dirname);
   } else {
     async function imp(path) {
       const jsonArray = await csv().fromFile(path);
-      // console.log(jsonArray)
       process.stdout.write(jsonArray.toString());
     }
-    imp(`${__dirname}/${argv.f}`)
-
+    imp(`${__dirname}/${argv.f}`);
   }
 }
 
-if (argv.a === 'transformToFile') {
+if (argv.a === "transformToFile") {
   yargs.option({
-    'f': {
-      alias: 'file',
+    f: {
+      alias: "file",
       demandOption: true,
-      describe: 'File you want to convert data'
+      describe: "File you want to convert data"
     }
-  })
-  if (!argv.f || !(typeof argv.f === 'string')) {
-    console.error('Additional option --file(-f) is required', __dirname)
+  });
+  if (!argv.f || !(typeof argv.f === "string")) {
+    console.error("Additional option --file(-f) is required", __dirname);
   } else {
     let readStream = fs.createReadStream(`${__dirname}/${argv.f}`);
     let writeStream = fs.createWriteStream(`${__dirname}/result.json`);
     readStream.pipe(csv()).pipe(writeStream);
-    readStream.on('error', function (err) {
-      if (err.code == 'ENOENT') {
+    readStream.on("error", function(err) {
+      if (err.code == "ENOENT") {
         console.log("File not Found!");
       } else {
         console.error(err);
       }
     });
-
   }
 }
 
-if (argv.a === 'cssBundler') {
+if (argv.a === "cssBundler") {
   yargs.option({
-    'p': {
-      alias: 'path',
+    p: {
+      alias: "path",
       demandOption: true,
-      describe: 'Directory with css files'
+      describe: "Directory with css files"
     }
-  })
-  if (!argv.p || !(typeof argv.p === 'string')) {
-    console.error('Additional option --path(-p) is required', __dirname)
+  });
+  if (!argv.p || !(typeof argv.p === "string")) {
+    console.error("Additional option --path(-p) is required", __dirname);
   } else {
     const css = `
 .ngmp18 {
@@ -130,33 +135,38 @@ if (argv.a === 'cssBundler') {
 }`;
     fs.readdir(argv.p, (err, items) => {
       if (err) {
-        if (err.code == 'ENOENT') {
+        if (err.code == "ENOENT") {
           console.log("Path not Found!");
         } else {
           console.error(err);
         }
       } else {
         items.forEach(item => {
-          if (path.parse(item).name === 'bundle') {
-            fs.writeFileSync(`${argv.p}/bundle.css`, '');
-          };
-        })
-        items.forEach(item => {
-          if (path.parse(item).ext === '.css') {
-            let readFile = fs.readFileSync(`${argv.p}/${item}`, 'utf8');
-            fs.appendFileSync(`${argv.p}/bundle.css`, `\n${readFile}`, 'utf8', (err) => {
-              if (err) throw err;
-              console.log('Данные были добавлены в конец файла!');
-            });
+          if (path.parse(item).name === "bundle") {
+            fs.writeFileSync(`${argv.p}/bundle.css`, "");
           }
-        })
-        fs.appendFileSync(`${argv.p}/bundle.css`, `\n${css}`, 'utf8', (err) => {
+        });
+        items.forEach(item => {
+          if (path.parse(item).ext === ".css") {
+            let readFile = fs.readFileSync(`${argv.p}/${item}`, "utf8");
+            fs.appendFileSync(
+              `${argv.p}/bundle.css`,
+              `\n${readFile}`,
+              "utf8",
+              err => {
+                if (err) throw err;
+                console.log("Данные были добавлены в конец файла!");
+              }
+            );
+          }
+        });
+        fs.appendFileSync(`${argv.p}/bundle.css`, `\n${css}`, "utf8", err => {
           if (err) throw err;
-          console.log('Данные были добавлены в конец файла!');
+          console.log("Данные были добавлены в конец файла!");
         });
       }
-    })
+    });
   }
 }
 
-yargs.help('help').alias('help', 'h')
+yargs.help("help").alias("help", "h");
