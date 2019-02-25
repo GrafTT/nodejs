@@ -155,14 +155,14 @@ if (argv.a === "cssBundler") {
               "utf8",
               err => {
                 if (err) throw err;
-                console.log("Данные были добавлены в конец файла!");
+                console.log("Data has been added to the end of file");
               }
             );
           }
         });
         fs.appendFileSync(`${argv.p}/bundle.css`, `\n${css}`, "utf8", err => {
           if (err) throw err;
-          console.log("Данные были добавлены в конец файла!");
+          console.log("Data has been added to the end of file");
         });
       }
     });
