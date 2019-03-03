@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import routes from "./routes/routes";
 
 const app = express();
-
+app.use(bodyParser.json());
 app.use(cookieParser(), function(req, res, next) {
   req.parsedCookies = cookieParser.JSONCookies(req.cookies);
   next();
