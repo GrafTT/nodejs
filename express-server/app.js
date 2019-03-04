@@ -1,10 +1,34 @@
 import express from "express";
+import passport from "passport";
+import session from "express-session";
 import cookieParser from "cookie-parser";
-import bodyParser from "body-parser";
 import routes from "./routes/routes";
+import './config/passport-local-strategy';
+import './config/passport-google';
+
+const FileStore = require('session-file-store')(session);
 
 const app = express();
-app.use(bodyParser.json());
+
+app.use(express.json());
+
+app.use(
+  session({
+    secret: 'secret',
+    store: new FileStore(),
+    cookie: {
+      path: '/',
+      httpOnly: true,
+      maxAge: 60 * 60 * 1000,
+    },
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(cookieParser(), function(req, res, next) {
   req.parsedCookies = cookieParser.JSONCookies(req.cookies);
   next();
