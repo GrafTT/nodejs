@@ -7,17 +7,19 @@ const userLocal = {
   password: "123456"
 };
 
-passport.serializeUser(function(user, done) {
-    done(null, user.id);
-  });
-  
-  passport.deserializeUser(function(id, done) {
-    const user = userLocal.id === id ?userLocal : false;
-    done(null, user)
-  });
+passport.serializeUser(function (user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function (id, done) {
+  const user = userLocal.id === id ? userLocal : false;
+  done(null, user)
+});
 
 passport.use(
-  new LocalStrategy({ usernameField: "email" }, function(
+  new LocalStrategy({
+    usernameField: "email"
+  }, function (
     email,
     password,
     done

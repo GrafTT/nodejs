@@ -5,6 +5,8 @@ import cookieParser from "cookie-parser";
 import routes from "./routes/routes";
 import './config/passport-local-strategy';
 import './config/passport-google';
+import './config/passport-facebook';
+import './config/passport-twitter';
 
 const FileStore = require('session-file-store')(session);
 
@@ -29,12 +31,12 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(cookieParser(), function(req, res, next) {
+app.use(cookieParser(), function (req, res, next) {
   req.parsedCookies = cookieParser.JSONCookies(req.cookies);
   next();
 });
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   req.parsedQuery = req.query;
   next();
 });
