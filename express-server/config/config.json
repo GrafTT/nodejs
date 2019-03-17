@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "slava",
+    "password": "",
+    "database": "nodejs_db",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "slava",
+    "password": "",
+    "database": "nodejs_db",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "slava",
+    "password": "",
+    "database": "nodejs_db",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  }
+}

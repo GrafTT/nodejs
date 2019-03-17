@@ -7,10 +7,20 @@ import './config/passport-local-strategy';
 import './config/passport-google';
 import './config/passport-facebook';
 import './config/passport-twitter';
+import db from './config/database';
 
 const FileStore = require('session-file-store')(session);
 
 const app = express();
+
+db
+  .authenticate()
+  .then(() => {
+    console.log('Connection has been established successfully.');
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
 
 app.use(express.json());
 
