@@ -62,3 +62,5 @@ typings/
 
 #keys
 .express-server/config/keys
+
+.vscode
