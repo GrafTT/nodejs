@@ -1,5 +1,6 @@
 import express from "express";
 import passport from "passport";
+import mongoose from "mongoose";
 import session from "express-session";
 import cookieParser from "cookie-parser";
 import routes from "./routes/routes";
@@ -45,6 +46,11 @@ app.use(routes);
 
 export default {
   listen(port, callback) {
-    app.listen(port, callback);
+    mongoose.connect("mongodb://localhost:27017/myproject", {
+      useNewUrlParser: true
+    }, function (err) {
+      if (err) return console.log(err);
+      app.listen(port, callback);
+    });
   }
 };
