@@ -1,23 +1,56 @@
-import config from "./config/config";
+import express from "express";
+import passport from "passport";
+import mongoose from "mongoose";
+import session from "express-session";
+import cookieParser from "cookie-parser";
+import routes from "./routes/routes";
+import './config/passport-local-strategy';
+import './config/passport-google';
+import './config/passport-facebook';
+import './config/passport-twitter';
 
-import { User, Product } from "./models";
+const FileStore = require('session-file-store')(session);
 
-import DirWatcher from "./dirwatcher";
-import Importer from "./importer";
+const app = express();
 
+app.use(express.json());
 
-new User();
-new Product();
+app.use(
+  session({
+    secret: 'secret',
+    store: new FileStore(),
+    cookie: {
+      path: '/',
+      httpOnly: true,
+      maxAge: 60 * 60 * 1000,
+    },
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
-const watcher = new DirWatcher();
-const importer = new Importer();
+app.use(passport.initialize());
+app.use(passport.session());
 
-watcher.watch("./data", 1000);
-// watcher.on("changed", data => {
-//   importer.import(data);
-// });
-watcher.on("changed", data => {
-  importer.importSync(data);
+app.use(cookieParser(), function (req, res, next) {
+  req.parsedCookies = cookieParser.JSONCookies(req.cookies);
+  next();
 });
 
-console.log(importer.jsonData);
+app.use(function (req, res, next) {
+  req.parsedQuery = req.query;
+  next();
+});
+
+app.use(routes);
+
+export default {
+  listen(port, callback) {
+    mongoose.connect("mongodb://localhost:27017/myproject", {
+      useNewUrlParser: true
+    }, function (err) {
+      if (err) return console.log(err);
+      app.listen(port, callback);
+    });
+  }
+};
