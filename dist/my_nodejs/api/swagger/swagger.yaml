@@ -20,22 +20,180 @@ produces:
 paths:
   /products:
     # binds a127 app logic to a route
-    x-swagger-router-controller: get_all_products
+    x-swagger-router-controller: products
     get:
       description: Returns all products from db
       # used as the method name of the controller
-      operationId: products
+      operationId: getAllProducts
+      produces: 
+        - application/json
       responses:
         "200":
           description: Success
           schema:
-            # a pointer to a definition
-            $ref: "#/definitions/Product"
-        # responses may fall through to errors
-        default:
-          description: Error
+            type: array
+            items:
+              $ref: "#/definitions/Product"
+    post:
+      description: Add new product and return all
+      operationId: addNewProduct
+      produces: 
+        - application/json
+      parameters:
+        - in: body
+          name: product
+          description: New product will be added to db
+          required: true
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Product"
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Product"
+  /product/{id}:
+    x-swagger-router-controller: products
+    get:
+      description: Retrive a single product by id
+      operationId: getProductById
+      produces: 
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: Find product by id in db
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Product"
+    delete:
+      description: Delete a single product by id
+      operationId: deleteProductById
+      produces: 
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: Delete product by id in db
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Product"
+  /cities:
+    x-swagger-router-controller: cities
+    get:
+      description: Returns all cities from db
+      # used as the method name of the controller
+      operationId: getAllCities
+      produces: 
+        - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/City"
+    post:
+      description: Add new city and return all
+      operationId: addNewCities
+      produces: 
+        - application/json
+      parameters:
+        - in: body
+          name: product
+          description: New city will be added to db
+          required: true
+          schema:
+            $ref: "#/definitions/City"
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/City"
+  /cities/{id}:
+    x-swagger-router-controller: cities
+    delete:
+      description: Delete a single city by id
+      operationId: deleteCityById
+      produces: 
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: Delete city by id in db
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/City"
+    put:
+      description: Update a single city by id
+      operationId: updateCityById
+      produces: 
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: Update city by id in db
+          required: true
+          type: string
+        - in: body
+          name: updated_city
+          description: Update city by id in db
+          required: true
+          schema:
+            $ref: "#/definitions/City"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/City"
+  /users:
+    x-swagger-router-controller: users
+    get:
+      description: Returns all users from db
+      # used as the method name of the controller
+      operationId: getAllUsers
+      produces: 
+        - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/User"
+  /users/{id}:
+    x-swagger-router-controller: users
+    delete:
+      description: Delete a single user by id
+      operationId: deleteUserById
+      produces: 
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: Delete user by id in db
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/User"
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
@@ -53,6 +211,38 @@ definitions:
         type: integer
       reviews:
         type: integer
+  User:
+    type: object
+    required:
+      - firstName
+      - email
+    properties:
+      firstName:
+        type: string
+      lastName:
+        type: string
+      email:
+        type: string
+  City:
+    type: object
+    required:
+     - name
+     - country
+     - capital
+    properties:
+      name:
+        type: string
+      country:
+        type: string
+      capital:
+        type: boolean
+      location:
+        type: object
+        properties:
+          lat:
+            type: number
+          long:
+            type: number
   ErrorResponse:
     required:
       - message
